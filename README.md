@@ -17,7 +17,7 @@
 
 **Socials:**
 [![GitHub](https://img.shields.io/badge/GitHub-iamsrikanthnani-black?style=flat&logo=github)](https://github.com/iamsrikanthnani)
-[![Twitter](https://img.shields.io/badge/Twitter-@truly__sn-1DA1F2?style=flat&logo=twitter)](https://x.com/truly_sn)
+[![Twitter](https://img.shields.io/badge/Twitter-@truly__sn-1DA1F2?style=flat&logo=twitter)](https://x.com/srikanthnani)
 [![Website](https://img.shields.io/badge/Website-srikanthnani.com-blue?style=flat&logo=globe)](https://www.srikanthnani.com/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-iamsrikanthnani-0077B5?style=flat&logo=linkedin)](https://www.linkedin.com/in/iamsrikanthnani/)
 
@@ -530,7 +530,7 @@ This project is licensed under the **GNU General Public License v3.0** - see the
 ### 🌐 **Let's Connect**
 
 [![GitHub](https://img.shields.io/badge/GitHub-iamsrikanthnani-black?style=for-the-badge&logo=github)](https://github.com/iamsrikanthnani)&nbsp;
-[![Twitter](https://img.shields.io/badge/Twitter-@truly__sn-black?style=for-the-badge&logo=twitter)](https://x.com/truly_sn)&nbsp;
+[![Twitter](https://img.shields.io/badge/Twitter-@truly__sn-black?style=for-the-badge&logo=twitter)](https://x.com/srikanthnani)&nbsp;
 [![Website](https://img.shields.io/badge/Website-srikanthnani.com-black?style=for-the-badge&logo=globe)](https://www.srikanthnani.com/)&nbsp;
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-iamsrikanthnani-black?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/iamsrikanthnani/)&nbsp;
 [![License](https://img.shields.io/badge/License-GPL%20v3-black?style=for-the-badge&logo=gnu&logoColor=white)](LICENSE)

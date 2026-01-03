@@ -192,5 +192,18 @@ pub fn create_dashboard_window<R: Runtime>(
         .content_protected(true)
         .visible(true);
 
-    base_builder.build()
+    let window = base_builder.build()?;
+
+    // Prevent window from being destroyed on close - just hide it instead
+    let window_clone = window.clone();
+    window.on_window_event(move |event| {
+        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+            // Prevent the window from closing
+            api.prevent_close();
+            // Hide the window instead
+            let _ = window_clone.hide();
+        }
+    });
+
+    Ok(window)
 }
