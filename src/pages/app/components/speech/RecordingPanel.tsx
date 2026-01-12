@@ -8,7 +8,6 @@ interface RecordingPanelProps {
   isAIProcessing: boolean;
   recordingProgress: number;
   maxDuration: number;
-  stream: MediaStream | null;
   onStartRecording: () => void;
   onStopAndSend: () => void;
   onIgnore: () => void;

@@ -63,7 +63,6 @@ export const SystemAudio = (props: useSystemAudioType) => {
     startContinuousRecording,
     ignoreContinuousRecording,
     scrollAreaRef,
-    stream,
   } = props;
 
   const { hasActiveLicense } = useApp();
@@ -343,7 +342,6 @@ export const SystemAudio = (props: useSystemAudioType) => {
                       isAIProcessing={isAIProcessing}
                       recordingProgress={recordingProgress}
                       maxDuration={vadConfig.max_recording_duration_secs}
-                      stream={stream}
                       onStartRecording={startContinuousRecording}
                       onStopAndSend={manualStopAndSend}
                       onIgnore={ignoreContinuousRecording}
@@ -378,7 +376,7 @@ export const SystemAudio = (props: useSystemAudioType) => {
 
             {/* Quick Actions */}
             {!setupRequired && hasResponse && (
-              <div className="flex-shrink-0 border-t border-border/50 p-1">
+              <div className="flex-shrink-0 border-t border-border/50 p-2">
                 <QuickActions
                   actions={quickActions}
                   onActionClick={handleQuickActionClick}
