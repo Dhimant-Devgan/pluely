@@ -47,7 +47,7 @@ fn get_secure_storage_path(app: &AppHandle) -> Result<PathBuf, String> {
 struct SecureStorage {
     license_key: Option<String>,
     instance_id: Option<String>,
-    selected_pluely_model: Option<String>,
+    selected_jamunai_model: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -60,7 +60,7 @@ pub struct StorageItem {
 pub struct StorageResult {
     license_key: Option<String>,
     instance_id: Option<String>,
-    selected_pluely_model: Option<String>,
+    selected_jamunai_model: Option<String>,
 }
 
 #[tauri::command]
@@ -77,9 +77,9 @@ pub async fn secure_storage_save(app: AppHandle, items: Vec<StorageItem>) -> Res
 
     for item in items {
         match item.key.as_str() {
-            "pluely_license_key" => storage.license_key = Some(item.value),
-            "pluely_instance_id" => storage.instance_id = Some(item.value),
-            "selected_pluely_model" => storage.selected_pluely_model = Some(item.value),
+            "jamunai_license_key" => storage.license_key = Some(item.value),
+            "jamunai_instance_id" => storage.instance_id = Some(item.value),
+            "selected_jamunai_model" => storage.selected_jamunai_model = Some(item.value),
             _ => return Err(format!("Invalid storage key: {}", item.key)),
         }
     }
@@ -101,7 +101,7 @@ pub async fn secure_storage_get(app: AppHandle) -> Result<StorageResult, String>
         return Ok(StorageResult {
             license_key: None,
             instance_id: None,
-            selected_pluely_model: None,
+            selected_jamunai_model: None,
         });
     }
 
@@ -114,7 +114,7 @@ pub async fn secure_storage_get(app: AppHandle) -> Result<StorageResult, String>
     Ok(StorageResult {
         license_key: storage.license_key,
         instance_id: storage.instance_id,
-        selected_pluely_model: storage.selected_pluely_model,
+        selected_jamunai_model: storage.selected_jamunai_model,
     })
 }
 
@@ -134,9 +134,9 @@ pub async fn secure_storage_remove(app: AppHandle, keys: Vec<String>) -> Result<
 
     for key in keys {
         match key.as_str() {
-            "pluely_license_key" => storage.license_key = None,
-            "pluely_instance_id" => storage.instance_id = None,
-            "selected_pluely_model" => storage.selected_pluely_model = None,
+            "jamunai_license_key" => storage.license_key = None,
+            "jamunai_instance_id" => storage.instance_id = None,
+            "selected_jamunai_model" => storage.selected_jamunai_model = None,
             _ => return Err(format!("Invalid storage key: {}", key)),
         }
     }
@@ -310,68 +310,12 @@ pub async fn deactivate_license_api(app: AppHandle) -> Result<ActivationResponse
 
 #[tauri::command]
 pub async fn validate_license_api(app: AppHandle) -> Result<ValidateResponse, String> {
-    // Get payment endpoint and API access key from environment
-    let payment_endpoint = get_payment_endpoint()?;
-    let api_access_key = get_api_access_key()?;
-    let machine_id: String = app.machine_uid().get_machine_uid().unwrap().id.unwrap();
-    let (license_key, instance_id, _) = get_stored_credentials(&app).await?;
-    let app_version: String = env!("CARGO_PKG_VERSION").to_string();
-    let validate_request = ActivationRequest {
-        license_key: license_key.clone(),
-        instance_name: instance_id.clone(),
-        machine_id: machine_id.clone(),
-        app_version: app_version.clone(),
-    };
-
-    if license_key.is_empty() || instance_id.is_empty() {
-        return Ok(ValidateResponse {
-            is_active: false,
-            last_validated_at: None,
-            is_dev_license: false,
-        });
-    }
-
-    // Make HTTP request to validate endpoint with authorization header
-    let client = reqwest::Client::new();
-    let url = format!("{}/validate", payment_endpoint);
-
-    let response = client
-        .post(&url)
-        .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {}", api_access_key))
-        .json(&validate_request)
-        .send()
-        .await
-        .map_err(|e| {
-            let error_msg = format!("{}", e);
-            if error_msg.contains("url (") {
-                // Remove the URL part from the error message
-                let parts: Vec<&str> = error_msg.split(" for url (").collect();
-                if parts.len() > 1 {
-                    format!("Failed to make chat request: {}", parts[0])
-                } else {
-                    format!("Failed to make chat request: {}", error_msg)
-                }
-            } else {
-                format!("Failed to make chat request: {}", error_msg)
-            }
-        })?;
-
-    let validate_response: ValidateResponse = response.json().await.map_err(|e| {
-        let error_msg = format!("{}", e);
-        if error_msg.contains("url (") {
-            // Remove the URL part from the error message
-            let parts: Vec<&str> = error_msg.split(" for url (").collect();
-            if parts.len() > 1 {
-                format!("Failed to make chat request: {}", parts[0])
-            } else {
-                format!("Failed to make chat request: {}", error_msg)
-            }
-        } else {
-            format!("Failed to make chat request: {}", error_msg)
-        }
-    })?;
-    Ok(validate_response)
+    // License validation bypassed - always return active
+    Ok(ValidateResponse {
+        is_active: true,
+        last_validated_at: None,
+        is_dev_license: true,
+    })
 }
 
 #[tauri::command]

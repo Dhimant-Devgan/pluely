@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { GetLicense } from "@/components";
-import { PluelyApiSetup, Usage } from "./components";
+import { JamunAIApiSetup, Usage } from "./components";
 import { PageLayout } from "@/layouts";
 import { useApp } from "@/contexts";
 
@@ -49,11 +49,10 @@ const Dashboard = () => {
   return (
     <PageLayout
       title="Dashboard"
-      description="Pluely license to unlock faster responses, quicker support and premium features."
-      rightSlot={!hasActiveLicense ? <GetLicense /> : null}
+      description="Get started with JamunAI API or configure your own providers."
     >
-      {/* Pluely API Setup */}
-      <PluelyApiSetup />
+      {/* JamunAI API Setup */}
+      <JamunAIApiSetup />
 
       <Usage
         loading={loadingActivity}

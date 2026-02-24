@@ -37,14 +37,14 @@ pub struct LicenseState {
 impl Default for LicenseState {
     fn default() -> Self {
         LicenseState {
-            has_active_license: AtomicBool::new(false),
+            has_active_license: AtomicBool::new(true), // Always active
         }
     }
 }
 
 impl LicenseState {
     pub fn is_active(&self) -> bool {
-        self.has_active_license.load(Ordering::Relaxed)
+        true // Always return true
     }
 
     pub fn set_active(&self, active: bool) {

@@ -2694,6 +2694,46 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
+name = "jamunai"
+version = "0.1.9"
+dependencies = [
+ "anyhow",
+ "base64 0.22.1",
+ "cidre",
+ "cpal",
+ "dotenv",
+ "futures-util",
+ "hound",
+ "image",
+ "libpulse-binding",
+ "libpulse-simple-binding",
+ "once_cell",
+ "reqwest 0.12.23",
+ "ringbuf",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-nspanel",
+ "tauri-plugin-autostart",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-http",
+ "tauri-plugin-keychain",
+ "tauri-plugin-machine-uid",
+ "tauri-plugin-macos-permissions",
+ "tauri-plugin-opener",
+ "tauri-plugin-posthog",
+ "tauri-plugin-shell",
+ "tauri-plugin-sql",
+ "tauri-plugin-updater",
+ "tokio",
+ "tracing",
+ "uuid",
+ "wasapi",
+ "xcap",
+]
+
+[[package]]
 name = "javascriptcore-rs"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4120,46 +4160,6 @@ dependencies = [
  "quick-xml 0.38.1",
  "serde",
  "time",
-]
-
-[[package]]
-name = "pluely"
-version = "0.1.9"
-dependencies = [
- "anyhow",
- "base64 0.22.1",
- "cidre",
- "cpal",
- "dotenv",
- "futures-util",
- "hound",
- "image",
- "libpulse-binding",
- "libpulse-simple-binding",
- "once_cell",
- "reqwest 0.12.23",
- "ringbuf",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-nspanel",
- "tauri-plugin-autostart",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-http",
- "tauri-plugin-keychain",
- "tauri-plugin-machine-uid",
- "tauri-plugin-macos-permissions",
- "tauri-plugin-opener",
- "tauri-plugin-posthog",
- "tauri-plugin-shell",
- "tauri-plugin-sql",
- "tauri-plugin-updater",
- "tokio",
- "tracing",
- "uuid",
- "wasapi",
- "xcap",
 ]
 
 [[package]]

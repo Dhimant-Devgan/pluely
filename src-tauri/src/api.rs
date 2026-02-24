@@ -48,7 +48,7 @@ fn get_secure_storage_path(app: &AppHandle) -> Result<PathBuf, String> {
 struct SecureStorage {
     license_key: Option<String>,
     instance_id: Option<String>,
-    selected_pluely_model: Option<String>,
+    selected_jamunai_model: Option<String>,
 }
 
 pub async fn get_stored_credentials(
@@ -56,8 +56,13 @@ pub async fn get_stored_credentials(
 ) -> Result<(String, String, Option<Model>), String> {
     let storage_path = get_secure_storage_path(app)?;
 
+    // Return default values if storage doesn't exist (license bypassed)
     if !storage_path.exists() {
-        return Err("No license found. Please activate your license first.".to_string());
+        return Ok((
+            "bypass-license".to_string(),
+            "bypass-instance".to_string(),
+            None,
+        ));
     }
 
     let content = fs::read_to_string(&storage_path)
@@ -66,15 +71,12 @@ pub async fn get_stored_credentials(
     let storage: SecureStorage = serde_json::from_str(&content)
         .map_err(|e| format!("Failed to parse storage file: {}", e))?;
 
-    let license_key = storage
-        .license_key
-        .ok_or("License key not found".to_string())?;
-    let instance_id = storage
-        .instance_id
-        .ok_or("Instance ID not found".to_string())?;
+    // Return default values if license key is not set (license bypassed)
+    let license_key = storage.license_key.unwrap_or_else(|| "bypass-license".to_string());
+    let instance_id = storage.instance_id.unwrap_or_else(|| "bypass-instance".to_string());
 
     let selected_model: Option<Model> = storage
-        .selected_pluely_model
+        .selected_jamunai_model
         .and_then(|json_str| serde_json::from_str(&json_str).ok());
 
     Ok((license_key, instance_id, selected_model))
@@ -128,9 +130,9 @@ pub struct SystemPromptResponse {
     system_prompt: String,
 }
 
-// Pluely Prompts API
+// JamunAI Prompts API
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct PluelyPrompt {
+pub struct JamunAIPrompt {
     title: String,
     prompt: String,
     #[serde(rename = "modelId")]
@@ -140,8 +142,8 @@ pub struct PluelyPrompt {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct PluelyPromptsResponse {
-    prompts: Vec<PluelyPrompt>,
+pub struct JamunAIPromptsResponse {
+    prompts: Vec<JamunAIPrompt>,
     total: i32,
     #[serde(rename = "last_updated")]
     last_updated: Option<String>,
@@ -958,9 +960,9 @@ pub async fn fetch_models(app: AppHandle) -> Result<Vec<Model>, String> {
     Ok(models_response.models)
 }
 
-// Fetch Pluely Prompts API
+// Fetch JamunAI Prompts API
 #[tauri::command]
-pub async fn fetch_prompts() -> Result<PluelyPromptsResponse, String> {
+pub async fn fetch_prompts() -> Result<JamunAIPromptsResponse, String> {
     let app_endpoint = get_app_endpoint()?;
     let api_access_key = get_api_access_key()?;
 
@@ -1006,7 +1008,7 @@ pub async fn fetch_prompts() -> Result<PluelyPromptsResponse, String> {
         return Err(format!("Server error ({}): {}", status, error_text));
     }
 
-    let prompts_response: PluelyPromptsResponse = response
+    let prompts_response: JamunAIPromptsResponse = response
         .json()
         .await
         .map_err(|e| format!("Failed to parse prompts response: {}", e))?;

@@ -5,7 +5,6 @@ import {
   STORAGE_KEYS,
 } from "@/config";
 import { getPlatform, safeLocalStorage, trackAppStart } from "@/lib";
-import { getShortcutsConfig } from "@/lib/storage";
 import {
   getCustomizableState,
   setCustomizableState,
@@ -131,7 +130,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [customizable, setCustomizable] = useState<CustomizableState>(
     DEFAULT_CUSTOMIZABLE_STATE
   );
-  const [hasActiveLicense, setHasActiveLicense] = useState<boolean>(false);
+  const [hasActiveLicense, setHasActiveLicense] = useState<boolean>(true);
   const [supportsImages, setSupportsImagesState] = useState<boolean>(() => {
     const stored = safeLocalStorage.getItem(STORAGE_KEYS.SUPPORTS_IMAGES);
     return stored === null ? true : stored === "true";
@@ -143,49 +142,24 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     safeLocalStorage.setItem(STORAGE_KEYS.SUPPORTS_IMAGES, String(value));
   };
 
-  // Pluely API State
-  const [pluelyApiEnabled, setPluelyApiEnabledState] = useState<boolean>(
+  // JamunAI API State
+  const [jamunaiApiEnabled, setJamunAIApiEnabledState] = useState<boolean>(
     safeLocalStorage.getItem(STORAGE_KEYS.PLUELY_API_ENABLED) === "true"
   );
 
   const getActiveLicenseStatus = async () => {
-    const response: { is_active: boolean; is_dev_license: boolean } =
-      await invoke("validate_license_api");
-    setHasActiveLicense(response.is_active);
+    setHasActiveLicense(true);
 
-    if (response?.is_dev_license) {
-      setPluelyApiEnabled(false);
-    }
-
-    // Check if the auto configs are enabled
     const autoConfigsEnabled = localStorage.getItem("auto-configs-enabled");
-    if (response.is_active && !autoConfigsEnabled) {
+    if (!autoConfigsEnabled) {
       setScreenshotConfiguration({
         mode: "auto",
         autoPrompt: "Analyze the screenshot and provide insights",
         enabled: false,
       });
-      // Set the flag to true so that we don't change the mode again
       localStorage.setItem("auto-configs-enabled", "true");
     }
   };
-
-  useEffect(() => {
-    const syncLicenseState = async () => {
-      try {
-        await invoke("set_license_status", {
-          hasLicense: hasActiveLicense,
-        });
-
-        const config = getShortcutsConfig();
-        await invoke("update_shortcuts", { config });
-      } catch (error) {
-        console.error("Failed to synchronize license state:", error);
-      }
-    };
-
-    syncLicenseState();
-  }, [hasActiveLicense]);
 
   // Function to load AI, STT, system prompt and screenshot config data from storage
   const loadData = () => {
@@ -276,12 +250,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
-    // Load Pluely API enabled state
-    const savedPluelyApiEnabled = safeLocalStorage.getItem(
+    // Load JamunAI API enabled state
+    const savedJamunAIApiEnabled = safeLocalStorage.getItem(
       STORAGE_KEYS.PLUELY_API_ENABLED
     );
-    if (savedPluelyApiEnabled !== null) {
-      setPluelyApiEnabledState(savedPluelyApiEnabled === "true");
+    if (savedJamunAIApiEnabled !== null) {
+      setJamunAIApiEnabledState(savedJamunAIApiEnabled === "true");
     }
 
     // Load selected audio devices
@@ -329,10 +303,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   // Load data on mount
   useEffect(() => {
     const initializeApp = async () => {
-      // Load license and data
       await getActiveLicenseStatus();
 
-      // Track app start
       try {
         const appVersion = await invoke<string>("get_app_version");
         const storage = await invoke<{
@@ -343,7 +315,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         console.debug("Failed to track app start:", error);
       }
     };
-    // Load data
     loadData();
     initializeApp();
   }, []);
@@ -453,15 +424,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   // Check if the current AI provider/model supports images
   useEffect(() => {
     const checkImageSupport = async () => {
-      if (pluelyApiEnabled) {
-        // For Pluely API, check the selected model's modality
+      if (jamunaiApiEnabled) {
+        // For JamunAI API, check the selected model's modality
         try {
           const storage = await invoke<{
-            selected_pluely_model?: string;
+            selected_jamunai_model?: string;
           }>("secure_storage_get");
 
-          if (storage.selected_pluely_model) {
-            const model = JSON.parse(storage.selected_pluely_model);
+          if (storage.selected_jamunai_model) {
+            const model = JSON.parse(storage.selected_jamunai_model);
             const hasImageSupport = model.modality?.includes("image") ?? false;
             setSupportsImages(hasImageSupport);
           } else {
@@ -486,7 +457,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     checkImageSupport();
-  }, [pluelyApiEnabled, selectedAIProvider.provider]);
+  }, [jamunaiApiEnabled, selectedAIProvider.provider]);
 
   // Sync selected AI to localStorage
   useEffect(() => {
@@ -533,7 +504,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
 
     // Update supportsImages immediately when provider changes
-    if (!pluelyApiEnabled) {
+    if (!jamunaiApiEnabled) {
       const selectedProvider = allAiProviders.find((p) => p.id === provider);
       if (selectedProvider) {
         const hasImageSupport =
@@ -614,18 +585,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     loadData();
   };
 
-  const setPluelyApiEnabled = async (enabled: boolean) => {
-    setPluelyApiEnabledState(enabled);
+  const setJamunAIApiEnabled = async (enabled: boolean) => {
+    setJamunAIApiEnabledState(enabled);
     safeLocalStorage.setItem(STORAGE_KEYS.PLUELY_API_ENABLED, String(enabled));
 
     if (enabled) {
       try {
         const storage = await invoke<{
-          selected_pluely_model?: string;
+          selected_jamunai_model?: string;
         }>("secure_storage_get");
 
-        if (storage.selected_pluely_model) {
-          const model = JSON.parse(storage.selected_pluely_model);
+        if (storage.selected_jamunai_model) {
+          const model = JSON.parse(storage.selected_jamunai_model);
           const hasImageSupport = model.modality?.includes("image") ?? false;
           setSupportsImages(hasImageSupport);
         } else {
@@ -633,7 +604,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           setSupportsImages(false);
         }
       } catch (error) {
-        console.debug("Failed to check Pluely model image support:", error);
+        console.debug("Failed to check JamunAI model image support:", error);
         setSupportsImages(false);
       }
     } else {
@@ -671,8 +642,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     toggleAlwaysOnTop,
     toggleAutostart,
     loadData,
-    pluelyApiEnabled,
-    setPluelyApiEnabled,
+    jamunaiApiEnabled,
+    setJamunAIApiEnabled,
     hasActiveLicense,
     setHasActiveLicense,
     getActiveLicenseStatus,
